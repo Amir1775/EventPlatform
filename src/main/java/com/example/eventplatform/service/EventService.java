@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
@@ -32,12 +33,9 @@ public class EventService {
     }
 
     @Transactional
-    public Event createEvent(String title,
-                             String description, String address,
-                             String startTime, String endTime,
-                             MultipartFile photo, Long categoryId,
-                             Long locationTypeId, Long organizerId) {
-        logger.info("Received photo: {}", photo != null ? "not null" : "null"); // НЕ ЗАБЫТЬ УБРАТЬ ЛОГ
+    public Event createEvent(String title, String description, String address, String startTime, String endTime,
+                             MultipartFile photo, Long categoryId, Long locationTypeId, Long organizerId) {
+        logger.info("Received photo: {}", photo != null ? "not null" : "null");
         Optional<User> organizer = userRepository.findById(organizerId);
         Optional<Category> category = categoryRepository.findById(categoryId);
         Optional<LocationType> locationType = locationTypeRepository.findById(locationTypeId);
@@ -53,14 +51,22 @@ public class EventService {
         event.setStartTime(startTime);
         event.setEndTime(endTime);
 
-        if (photo != null) {
+        if (photo != null && !photo.isEmpty()) {
+            String uploadDir = "D:\\IT-programs\\Java Spring PROJECT\\event-platform\\uploads\\";
+            File uploadDirFile = new File(uploadDir);
+            if (!uploadDirFile.exists()) { //это еслит папки не будет
+                uploadDirFile.mkdirs();
+            }
+            String fileName = System.currentTimeMillis() + "_" + photo.getOriginalFilename();
+            File file = new File(uploadDir + fileName);
             try {
-                event.setPhoto(photo.getBytes());
+                photo.transferTo(file); //сохранение файла
+                event.setPhotoPath(uploadDir + fileName);
             } catch (IOException e) {
-                throw new RuntimeException("Ошибка при загрузке фото", e);
+                throw new RuntimeException("Ошибка при сохранении фото: " + e.getMessage(), e);
             }
         } else {
-            event.setPhoto(null); // Устанавливаем null, если фото не передано
+            event.setPhotoPath(null);
         }
 
         event.setOrganizer(organizer.get());
@@ -71,38 +77,53 @@ public class EventService {
     }
 
     @Transactional
-    public Event updateEvent(Long id, String title, String description,
-                             String address, String startTime, String endTime,
+    public Event updateEvent(Long id, String title, String description, String address, String startTime, String endTime,
                              MultipartFile photo, Long categoryId, Long locationTypeId, Long organizerId) {
         Optional<Event> optionalEvent = eventRepository.findById(id);
         if (optionalEvent.isEmpty()) throw new IllegalStateException("Мероприятие не найдено");
 
         Event event = optionalEvent.get();
-        event.setTitle(title);
-        event.setDescription(description);
-        event.setAddress(address);
-        event.setStartTime(startTime);
-        event.setEndTime(endTime);
 
-        if (photo != null) {
+        // Обновляем только те поля, которые переданы
+        if (title != null) event.setTitle(title);
+        if (description != null) event.setDescription(description);
+        if (address != null) event.setAddress(address);
+        if (startTime != null) event.setStartTime(startTime);
+        if (endTime != null) event.setEndTime(endTime);
+
+        if (photo != null && !photo.isEmpty()) {
+            String uploadDir = "D:\\IT-programs\\Java Spring PROJECT\\event-platform\\uploads\\";
+            File uploadDirFile = new File(uploadDir);
+            if (!uploadDirFile.exists()) {
+                uploadDirFile.mkdirs();
+            }
+            String fileName = System.currentTimeMillis() + "_" + photo.getOriginalFilename();
+            File file = new File(uploadDir + fileName);
             try {
-                event.setPhoto(photo.getBytes());
+                photo.transferTo(file);
+                event.setPhotoPath("/uploads/" + fileName);
             } catch (IOException e) {
-                throw new RuntimeException("Ошибка при обновлении фото", e);
+                throw new RuntimeException("Ошибка при обновлении фото: " + e.getMessage(), e);
             }
         }
 
-        Optional<User> organizer = userRepository.findById(organizerId);
-        Optional<Category> category = categoryRepository.findById(categoryId);
-        Optional<LocationType> locationType = locationTypeRepository.findById(locationTypeId);
+        if (organizerId != null) {
+            Optional<User> organizer = userRepository.findById(organizerId);
+            if (organizer.isEmpty()) throw new IllegalStateException("Организатор не найден");
+            event.setOrganizer(organizer.get());
+        }
 
-        if (organizer.isEmpty()) throw new IllegalStateException("Организатор не найден");
-        if (category.isEmpty()) throw new IllegalStateException("Категория не найдена");
-        if (locationType.isEmpty()) throw new IllegalStateException("Тип места не найден");
+        if (categoryId != null) {
+            Optional<Category> category = categoryRepository.findById(categoryId);
+            if (category.isEmpty()) throw new IllegalStateException("Категория не найдена");
+            event.setCategory(category.get());
+        }
 
-        event.setOrganizer(organizer.get());
-        event.setCategory(category.get());
-        event.setLocationType(locationType.get());
+        if (locationTypeId != null) {
+            Optional<LocationType> locationType = locationTypeRepository.findById(locationTypeId);
+            if (locationType.isEmpty()) throw new IllegalStateException("Тип места не найден");
+            event.setLocationType(locationType.get());
+        }
 
         return eventRepository.save(event);
     }

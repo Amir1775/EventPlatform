@@ -17,9 +17,8 @@ public class Event {
     private String startTime;
     private String endTime;
 
-    @Lob
-    @Column(columnDefinition = "bytea")
-    private byte[] photo;
+    @Column(name = "photo_path")
+    private String photoPath;
 
     @ManyToOne
     private User organizer;

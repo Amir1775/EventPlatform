@@ -41,17 +41,17 @@ public class EventController {
     @PutMapping("/{id}")
     public ResponseEntity<Event> updateEvent(
             @PathVariable Long id,
-            @RequestParam("title") String title,
-            @RequestParam("description") String description,
-            @RequestParam("address") String address,
-            @RequestParam("startTime") String startTime,
-            @RequestParam("endTime") String endTime,
+            @RequestParam(value = "title", required = false) String title,
+            @RequestParam(value = "description", required = false) String description,
+            @RequestParam(value = "address", required = false) String address,
+            @RequestParam(value = "startTime", required = false) String startTime,
+            @RequestParam(value = "endTime", required = false) String endTime,
             @RequestParam(value = "photo", required = false) MultipartFile photo,
-            @RequestParam("categoryId") Long categoryId,
-            @RequestParam("locationTypeId") Long locationTypeId,
-            @RequestParam("organizerId") Long organizerId) {
-        Event event = eventService.updateEvent(id, title, description, address, startTime, endTime, photo, categoryId, locationTypeId, organizerId);
-        return ResponseEntity.ok(event);
+            @RequestParam(value = "categoryId", required = false) Long categoryId,
+            @RequestParam(value = "locationTypeId", required = false) Long locationTypeId,
+            @RequestParam(value = "organizerId", required = false) Long organizerId) {
+        Event updatedEvent = eventService.updateEvent(id, title, description, address, startTime, endTime, photo, categoryId, locationTypeId, organizerId);
+        return ResponseEntity.ok(updatedEvent);
     }
 
     @DeleteMapping("/{id}")
