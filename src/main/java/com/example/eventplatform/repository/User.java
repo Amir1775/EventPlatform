@@ -1,9 +1,11 @@
 package com.example.eventplatform.repository;
 
 import jakarta.persistence.*;
+import lombok.Data;
 
 @Entity
 @Table(name = "users")
+
 public class User {
 
     @Id

@@ -2,20 +2,27 @@ package com.example.eventplatform.controller;
 
 import com.example.eventplatform.repository.Event;
 import com.example.eventplatform.service.EventService;
+import com.example.eventplatform.service.PdfService;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/events")
 public class EventController {
 
     private final EventService eventService;
+    private final PdfService pdfService;
 
-    public EventController(EventService eventService) {
+    public EventController(EventService eventService, PdfService pdfService) {
         this.eventService = eventService;
+        this.pdfService = pdfService;
     }
 
     @GetMapping
@@ -58,5 +65,22 @@ public class EventController {
     public ResponseEntity<Void> deleteEvent(@PathVariable Long id) {
         eventService.deleteEvent(id);
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/{id}/invitation")
+    public ResponseEntity<byte[]> getEventInvitation(@PathVariable Long id) throws Exception {
+        Optional<Event> optionalEvent = eventService.findById(id);
+        if (optionalEvent.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        Event event = optionalEvent.get();
+        byte[] pdfBytes = pdfService.generateEventPdf(event);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_PDF);
+        headers.setContentDispositionFormData("attachment", "invitation_" + id + ".pdf");
+
+        return new ResponseEntity<>(pdfBytes, headers, HttpStatus.OK);
     }
 }

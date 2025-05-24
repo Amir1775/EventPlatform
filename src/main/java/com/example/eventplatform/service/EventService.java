@@ -136,4 +136,8 @@ public class EventService {
     public void deleteEvent(Long id) {
         eventRepository.deleteById(id);
     }
+
+    public Optional<Event> findById(Long id) {
+        return eventRepository.findByIdWithDetails(id);
+    }
 }
