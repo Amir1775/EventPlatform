@@ -106,18 +106,36 @@
 </div>
 <div class="container">
     <div class="welcome-section">
-        <h2>Welcome, <span th:text="${userName}"></span>!</h2>
+        <h2>Welcome, <span th:text="${userName} ?: 'Guest'"></span>!</h2>
         <p>Organize your events with ease.</p>
     </div>
     <a th:href="@{/events/new}" class="create-event-btn">Create New Event</a>
-    <div class="events-list">
-        <div th:each="event : ${events}" class="event-card">
-            <h3 th:text="${event.title}"></h3>
-            <p><strong>Date:</strong> <span th:text="${event.startTime}"></span></p>
-            <p><strong>Location:</strong> <span th:text="${event.address}"></span></p>
-            <a th:href="@{'/events/' + ${event.id}}">View Details</a>
-        </div>
-    </div>
+    <div class="events-list" id="events-list"></div>
 </div>
+
+<script>
+    fetch('/api/events', {
+        headers: {
+            'Accept': 'application/json'
+        },
+        credentials: 'include'
+    })
+        .then(response => response.json())
+        .then(events => {
+            const eventsList = document.getElementById('events-list');
+            eventsList.innerHTML = '';
+            events.forEach(event => {
+                const eventCard = document.createElement('div');
+                eventCard.classList.add('event-card');
+                eventCard.innerHTML = `
+                    <h3>${event.title}</h3>
+                    <p><strong>Date:</strong> ${event.startTime}</p>
+                    <p><strong>Location:</strong> ${event.address}</p>
+                    <a href="/events?id=${event.id}">View Details</a>
+                `;
+                eventsList.appendChild(eventCard);
+            });
+        });
+</script>
 </body>
 </html>

@@ -64,7 +64,6 @@ public class User implements UserDetails {
         return true;
     }
 
-    // Геттеры и сеттеры (оставляем, хотя @Data их генерирует)
     public int getId() {
         return id;
     }

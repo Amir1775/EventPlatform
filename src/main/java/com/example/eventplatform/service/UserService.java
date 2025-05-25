@@ -76,7 +76,6 @@ public class UserService {
         userRepository.save(user);
     }
 
-    // Метод для получения текущего пользователя
     public User getCurrentUser() {
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         String username;

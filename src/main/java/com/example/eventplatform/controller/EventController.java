@@ -1,8 +1,11 @@
 package com.example.eventplatform.controller;
 
 import com.example.eventplatform.repository.Event;
+import com.example.eventplatform.repository.EventRepository;
+import com.example.eventplatform.repository.User;
 import com.example.eventplatform.service.EventService;
 import com.example.eventplatform.service.PdfService;
+import com.example.eventplatform.service.UserService;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -19,15 +22,21 @@ public class EventController {
 
     private final EventService eventService;
     private final PdfService pdfService;
+    private final UserService userService;
+    private final EventRepository eventRepository;
 
-    public EventController(EventService eventService, PdfService pdfService) {
+    public EventController(EventService eventService, PdfService pdfService, UserService userService, EventRepository eventRepository) {
         this.eventService = eventService;
         this.pdfService = pdfService;
+        this.userService = userService;
+        this.eventRepository = eventRepository;
     }
 
     @GetMapping
     public List<Event> getAllEvents() {
-        return eventService.findAll();
+
+        com.example.eventplatform.repository.User currentUser = userService.getCurrentUser();
+        return eventRepository.findByOrganizerId(currentUser.getId());
     }
 
     @PostMapping
@@ -37,11 +46,14 @@ public class EventController {
             @RequestParam("address") String address,
             @RequestParam("startTime") String startTime,
             @RequestParam("endTime") String endTime,
-            @RequestParam(value = "photo", required = false) MultipartFile photo, //ПОТОМ РЕШИТЬ ПРОБЛЕМУ
+            @RequestParam(value = "photo", required = false) MultipartFile photo,
             @RequestParam("categoryId") Long categoryId,
-            @RequestParam("locationTypeId") Long locationTypeId,
-            @RequestParam("organizerId") int organizerId) {
-        Event event = eventService.createEvent(title, description, address, startTime, endTime, photo, categoryId, locationTypeId, organizerId);
+            @RequestParam("locationTypeId") Long locationTypeId) {
+        User currentUser = userService.getCurrentUser();
+        if (currentUser == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        Event event = eventService.createEvent(title, description, address, startTime, endTime, photo, categoryId, locationTypeId, currentUser.getId());
         return ResponseEntity.ok(event);
     }
 
