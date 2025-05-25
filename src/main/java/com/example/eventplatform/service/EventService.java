@@ -34,7 +34,7 @@ public class EventService {
 
     @Transactional
     public Event createEvent(String title, String description, String address, String startTime, String endTime,
-                             MultipartFile photo, Long categoryId, Long locationTypeId, Long organizerId) {
+                             MultipartFile photo, Long categoryId, Long locationTypeId, Integer organizerId) {
         logger.info("Received photo: {}", photo != null ? "not null" : "null");
         Optional<User> organizer = userRepository.findById(organizerId);
         Optional<Category> category = categoryRepository.findById(categoryId);
@@ -78,7 +78,7 @@ public class EventService {
 
     @Transactional
     public Event updateEvent(Long id, String title, String description, String address, String startTime, String endTime,
-                             MultipartFile photo, Long categoryId, Long locationTypeId, Long organizerId) {
+                             MultipartFile photo, Long categoryId, Long locationTypeId, Integer organizerId) {
         Optional<Event> optionalEvent = eventRepository.findById(id);
         if (optionalEvent.isEmpty()) throw new IllegalStateException("Мероприятие не найдено");
 

@@ -40,7 +40,7 @@ public class EventController {
             @RequestParam(value = "photo", required = false) MultipartFile photo, //ПОТОМ РЕШИТЬ ПРОБЛЕМУ
             @RequestParam("categoryId") Long categoryId,
             @RequestParam("locationTypeId") Long locationTypeId,
-            @RequestParam("organizerId") Long organizerId) {
+            @RequestParam("organizerId") int organizerId) {
         Event event = eventService.createEvent(title, description, address, startTime, endTime, photo, categoryId, locationTypeId, organizerId);
         return ResponseEntity.ok(event);
     }
@@ -56,7 +56,7 @@ public class EventController {
             @RequestParam(value = "photo", required = false) MultipartFile photo,
             @RequestParam(value = "categoryId", required = false) Long categoryId,
             @RequestParam(value = "locationTypeId", required = false) Long locationTypeId,
-            @RequestParam(value = "organizerId", required = false) Long organizerId) {
+            @RequestParam(value = "organizerId", required = false) Integer organizerId) {
         Event updatedEvent = eventService.updateEvent(id, title, description, address, startTime, endTime, photo, categoryId, locationTypeId, organizerId);
         return ResponseEntity.ok(updatedEvent);
     }
@@ -83,4 +83,6 @@ public class EventController {
 
         return new ResponseEntity<>(pdfBytes, headers, HttpStatus.OK);
     }
+
+
 }

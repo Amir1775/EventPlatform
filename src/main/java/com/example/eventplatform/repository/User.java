@@ -2,11 +2,16 @@ package com.example.eventplatform.repository;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.GrantedAuthority;
+
+import java.util.Collection;
+import java.util.Collections;
 
 @Entity
 @Table(name = "users")
-
-public class User {
+@Data
+public class User implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -29,9 +34,41 @@ public class User {
     public User() {
     }
 
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return Collections.emptyList(); // Пока без ролей
+    }
+
+    @Override
+    public String getUsername() {
+        return email;
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return true;
+    }
+
+    // Геттеры и сеттеры (оставляем, хотя @Data их генерирует)
     public int getId() {
         return id;
     }
+
     public void setId(int id) {
         this.id = id;
     }
@@ -39,13 +76,31 @@ public class User {
     public String getName() {
         return name;
     }
+
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getSurname() {
+        return surname;
+    }
+
+    public void setSurname(String surname) {
+        this.surname = surname;
+    }
+
+    public String getNumber() {
+        return number;
+    }
+
+    public void setNumber(String number) {
+        this.number = number;
     }
 
     public String getEmail() {
         return email;
     }
+
     public void setEmail(String email) {
         this.email = email;
     }
@@ -53,22 +108,9 @@ public class User {
     public String getPassword() {
         return password;
     }
+
     public void setPassword(String password) {
         this.password = password;
-    }
-
-    public String getSername() {
-        return surname;
-    }
-    public void setSername(String sername) {
-        this.surname = sername;
-    }
-
-    public String getNumber() {
-        return number;
-    }
-    public void setNumber(String number) {
-        this.number = number;
     }
 
     @Override
@@ -76,7 +118,7 @@ public class User {
         return "User{" +
                 "id=" + id +
                 ", name='" + name + '\'' +
-                ", sername='" + surname + '\'' +
+                ", surname='" + surname + '\'' +
                 ", number='" + number + '\'' +
                 ", email='" + email + '\'' +
                 ", password='" + password + '\'' +

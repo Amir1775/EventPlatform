@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home - Event Platform</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700&family=Open+Sans&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Open Sans', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #F4F4F9;
+            color: #2C3E50;
+        }
+        .navbar {
+            background-color: #2C3E50;
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: white;
+        }
+        .navbar h1 {
+            font-family: 'Montserrat', sans-serif;
+            margin: 0;
+            font-size: 24px;
+        }
+        .navbar a {
+            color: white;
+            text-decoration: none;
+            margin-left: 20px;
+            font-size: 16px;
+        }
+        .navbar a:hover {
+            color: #FF6F61;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+        .welcome-section {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+        .welcome-section h2 {
+            font-family: 'Montserrat', sans-serif;
+            color: #FF6F61;
+            margin-top: 0;
+        }
+        .create-event-btn {
+            background-color: #FF6F61;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            margin-bottom: 20px;
+        }
+        .create-event-btn:hover {
+            background-color: #E65B50;
+        }
+        .events-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        .event-card {
+            background-color: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        .event-card h3 {
+            font-family: 'Montserrat', sans-serif;
+            color: #2C3E50;
+            margin: 0 0 10px;
+        }
+        .event-card p {
+            margin: 5px 0;
+            color: #666;
+        }
+        .event-card a {
+            color: #FF6F61;
+            text-decoration: none;
+        }
+        .event-card a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+<div class="navbar">
+    <h1>Event Platform</h1>
+    <div>
+        <a th:href="@{/profile}">Profile</a>
+        <a th:href="@{/logout}">Logout</a>
+    </div>
+</div>
+<div class="container">
+    <div class="welcome-section">
+        <h2>Welcome, <span th:text="${userName}"></span>!</h2>
+        <p>Organize your events with ease.</p>
+    </div>
+    <a th:href="@{/events/new}" class="create-event-btn">Create New Event</a>
+    <div class="events-list">
+        <div th:each="event : ${events}" class="event-card">
+            <h3 th:text="${event.title}"></h3>
+            <p><strong>Date:</strong> <span th:text="${event.startTime}"></span></p>
+            <p><strong>Location:</strong> <span th:text="${event.address}"></span></p>
+            <a th:href="@{'/events/' + ${event.id}}">View Details</a>
+        </div>
+    </div>
+</div>
+</body>
+</html>
