@@ -4,6 +4,7 @@ import com.example.eventplatform.repository.Event;
 import com.example.eventplatform.repository.EventRepository;
 import com.example.eventplatform.repository.User;
 import com.example.eventplatform.service.EventService;
+import org.springframework.http.ResponseEntity;
 import com.example.eventplatform.service.PdfService;
 import com.example.eventplatform.service.UserService;
 import org.springframework.http.HttpHeaders;
@@ -32,12 +33,13 @@ public class EventController {
         this.eventRepository = eventRepository;
     }
 
-    @GetMapping
-    public List<Event> getAllEvents() {
 
-        com.example.eventplatform.repository.User currentUser = userService.getCurrentUser();
-        return eventRepository.findByOrganizerId(currentUser.getId());
+    @GetMapping
+    public List<Event> findAll() {
+        return eventService.findAll();
     }
+
+
 
     @PostMapping
     public ResponseEntity<Event> createEvent(

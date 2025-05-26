@@ -129,6 +129,7 @@ public class EventService {
     }
 
     public List<Event> findAll() {
+
         return eventRepository.findAll();
     }
 

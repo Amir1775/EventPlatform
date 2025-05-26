@@ -26,7 +26,7 @@ public class SecurityConfig {
         http
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/register","/api/users", "/api/login").permitAll()
-                        .requestMatchers("/login.html", "/perform_login", "/home", "/error").permitAll() // Убрали /login, добавили /login.html
+                        .requestMatchers("/api/events/**","/api/registrations/**", "/my-registrations", "/login.html", "/perform_login", "/home", "/error", "/event-participants").permitAll() // Убрали /login, добавили /login.html
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form

@@ -94,9 +94,7 @@
         .event-card a:hover {
             text-decoration: underline;
         }
-        .delete-btn {
-            background-color: #E74C3C;
-            color: white;
+        .delete-btn, .join-btn, .participants-btn {
             padding: 5px 10px;
             border: none;
             border-radius: 5px;
@@ -104,8 +102,26 @@
             cursor: pointer;
             margin-left: 10px;
         }
+        .delete-btn {
+            background-color: #E74C3C;
+            color: white;
+        }
         .delete-btn:hover {
             background-color: #C0392B;
+        }
+        .join-btn {
+            background-color: #2ECC71;
+            color: white;
+        }
+        .join-btn:hover {
+            background-color: #27AE60;
+        }
+        .participants-btn {
+            background-color: #3498DB;
+            color: white;
+        }
+        .participants-btn:hover {
+            background-color: #2980B9;
         }
     </style>
 </head>
@@ -114,6 +130,7 @@
     <h1>Event Platform</h1>
     <div>
         <a th:href="@{/profile}">Profile</a>
+        <a th:href="@{/my-registrations}">My Registrations</a>
         <a th:href="@{/logout}">Logout</a>
     </div>
 </div>
@@ -138,22 +155,67 @@
             .then(events => {
                 const eventsList = document.getElementById('events-list');
                 eventsList.innerHTML = '';
-                events.forEach(event => {
-                    const eventCard = document.createElement('div');
-                    eventCard.classList.add('event-card');
-                    eventCard.innerHTML = `
-                        <h3>${event.title}</h3>
-                        <p><strong>Date:</strong> ${event.startTime}</p>
-                        <p><strong>Location:</strong> ${event.address}</p>
-                        <a href="/events?id=${event.id}">View Details</a>
-                        <button class="delete-btn" onclick="deleteEvent(${event.id})">Delete</button>
-                    `;
-                    eventsList.appendChild(eventCard);
-                });
+                fetch('/api/users/me', {
+                    headers: {
+                        'Accept': 'application/json'
+                    },
+                    credentials: 'include'
+                })
+                    .then(response => response.json())
+                    .then(currentUser => {
+                        events.forEach(event => {
+                            const eventCard = document.createElement('div');
+                            eventCard.classList.add('event-card');
+                            let buttons = `
+                                <a href="/events?id=${event.id}">View Details</a>
+                                <button class="join-btn" onclick="joinEvent(${event.id})">Join Event</button>
+                            `;
+                            if (event.organizer.id === currentUser.id) {
+                                buttons = `
+                                    <a href="/events?id=${event.id}">View Details</a>
+                                    <button class="participants-btn" onclick="viewParticipants(${event.id})">View Participants</button>
+                                    <button class="delete-btn" onclick="deleteEvent(${event.id})">Delete</button>
+                                `;
+                            }
+                            eventCard.innerHTML = `
+                                <h3>${event.title}</h3>
+                                <p><strong>Date:</strong> ${event.startTime}</p>
+                                <p><strong>Location:</strong> ${event.address}</p>
+                                <p><strong>Organizer:</strong> ${event.organizer.name}</p>
+                                ${buttons}
+                            `;
+                            eventsList.appendChild(eventCard);
+                        });
+                    })
+                    .catch(error => {
+                        console.error('Error loading current user:', error);
+                    });
             })
             .catch(error => {
                 console.error('Error loading events:', error);
             });
+    }
+
+    function joinEvent(eventId) {
+        if (confirm('Do you want to join this event?')) {
+            fetch(`/api/registrations/${eventId}`, {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json'
+                },
+                credentials: 'include'
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        return response.json().then(err => { throw new Error(err.message); });
+                    }
+                    alert('Successfully registered for the event!');
+                })
+                .catch(error => {
+                    console.error('Error joining event:', error);
+                    alert(error.message || 'Failed to join event. Please try again.');
+                });
+        }
     }
 
     function deleteEvent(eventId) {
@@ -179,7 +241,10 @@
         }
     }
 
-    // Загружаем мероприятия при загрузке страницы
+    function viewParticipants(eventId) {
+        window.location.href = `/event-participants?eventId=${eventId}`;
+    }
+
     loadEvents();
 </script>
 </body>
