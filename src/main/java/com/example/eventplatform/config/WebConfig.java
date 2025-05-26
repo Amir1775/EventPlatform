@@ -21,7 +21,7 @@ public class WebConfig implements WebMvcConfigurer {
 
     private SpringTemplateEngine templateEngine() {
         SpringTemplateEngine engine = new SpringTemplateEngine();
-        engine.setEnableSpringELCompiler(true); // Опционально, для производительности
+        engine.setEnableSpringELCompiler(true);
         return engine;
     }
 

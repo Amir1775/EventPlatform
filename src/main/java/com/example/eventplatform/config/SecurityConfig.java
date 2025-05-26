@@ -25,20 +25,20 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/users", "/api/login").permitAll()
+                        .requestMatchers("/register","/api/users", "/api/login").permitAll()
                         .requestMatchers("/login.html", "/perform_login", "/home", "/error").permitAll() // Убрали /login, добавили /login.html
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form
-                        .loginPage("/login.html") // Изменили на /login.html
+                        .loginPage("/login.html")
                         .loginProcessingUrl("/perform_login")
                         .defaultSuccessUrl("/home", true)
-                        .failureUrl("/login.html?error=true") // Изменили на /login.html
+                        .failureUrl("/login.html?error=true")
                         .permitAll()
                 )
                 .logout(logout -> logout
                         .logoutUrl("/logout")
-                        .logoutSuccessUrl("/login.html?logout=true") // Изменили на /login.html
+                        .logoutSuccessUrl("/login.html?logout=true")
                         .permitAll()
                 )
                 .csrf(csrf -> csrf.disable());
